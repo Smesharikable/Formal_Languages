@@ -11,7 +11,7 @@ import java.util.TreeSet;
  */
 public class TopologicalSort {
     
-    public static int[][] sort(int[][] ruleTable, int[] nonTermBounds) {
+    public static int[][] sort(RulesTable ruleTable, int[] nonTermBounds) {
         LinkedList<TreeSet<Integer>> levels = new LinkedList<TreeSet<Integer>>();
         TreeSet<Integer> ts = new TreeSet();
         int[][] relation = createRelation(ruleTable, nonTermBounds, ts);
@@ -47,9 +47,9 @@ public class TopologicalSort {
         return transformToArray(levels);
     }
     
-    private static int[][] createRelation(int[][] ruleTable, int[] nonTermBounds, TreeSet l0) {
-        int maxId = nonTermBounds[GrammarCoding.CURR];
-        int minId = nonTermBounds[GrammarCoding.MIN];
+    private static int[][] createRelation(RulesTable ruleTable, int[] nonTermBounds, TreeSet l0) {
+        int maxId = nonTermBounds[SymbolicTable.CURR];
+        int minId = nonTermBounds[SymbolicTable.MIN];
         int nonTermCount = maxId - minId;
         int[][] relation = new int[nonTermCount][nonTermCount];
         
@@ -64,11 +64,11 @@ public class TopologicalSort {
         
         int j, lex, count = 0;
         for (int i = 0; i < nonTermCount; i++) {
-            int[] rule = ruleTable[i];
+            int[] rule = ruleTable.getRule(i);
             j = 0;
-            while ( (lex = rule[j]) != GrammarCoding.DOT) {
+            while ( (lex = rule[j]) != SymbolicTable.DOT) {
                 if (lex >= minId && lex < maxId) {
-                    insertIntoRelation(relation[lex - GrammarCoding.OFFSET], i);
+                    insertIntoRelation(relation[lex - SymbolicTable.OFFSET], i);
                     count ++;
                 }
                 j ++;
@@ -105,8 +105,9 @@ public class TopologicalSort {
             result[i] = new int[ts.size()];
             j = 0;
             for (int integer : ts) {
-                result[i][j++] = integer; 
+                result[i][j++] = integer + SymbolicTable.OFFSET; 
             }
+            i ++;
         }
         
         return result;
