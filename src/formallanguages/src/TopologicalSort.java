@@ -24,7 +24,7 @@ public class TopologicalSort {
         
         Level tsnew;
         Iterator<Integer> iter;
-        ListIterator<TreeSet<Integer>> liter;
+        ListIterator<Level> liter;
         int [] temp;
         int current;
         int nonterm;

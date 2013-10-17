@@ -29,10 +29,15 @@ public class RulesTable {
     public int[] getRule(int code) {
         return pRulesTable[code];
     }    
+
+    public int getMaxRegLength() {
+        return pMaxRegLength;
+    }
     
     public int getCapacity() {
         return pNontermCount;
     }
+
     
     // TODO: add check for case that key has aleready used
     public int insert(int nonTermCode, int code, int position) throws TooLongRuleException {

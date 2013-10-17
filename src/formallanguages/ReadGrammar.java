@@ -27,5 +27,13 @@ public class ReadGrammar {
         Grammar gr = GrammarCoding.Coding(args[0]);
         NonterminalLevels result = TopologicalSort.sort(gr);
         result.print();
+        
+        gr.printRules();
+        System.out.println();
+        
+        boolean b = gr.regularize();
+        if (b) {
+            gr.printRules();
+        }
     }
 }

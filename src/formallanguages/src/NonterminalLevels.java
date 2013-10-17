@@ -1,8 +1,8 @@
 package formallanguages.src;
 
+import formallanguages.src.NonterminalLevels.Level;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.SortedSet;
@@ -12,7 +12,7 @@ import java.util.TreeSet;
  *
  * @author Ilya Shkuratov
  */
-public class NonterminalLevels extends LinkedList<TreeSet<Integer>>{
+public class NonterminalLevels extends LinkedList<Level>{
     private Grammar pGrammar;
     
     public NonterminalLevels() {
@@ -25,8 +25,8 @@ public class NonterminalLevels extends LinkedList<TreeSet<Integer>>{
     
     public int[][] transformToArray() {
         int[][] result  = new int[this.size()][];
-        ListIterator<TreeSet<Integer>> iter = this.listIterator();
-        TreeSet<Integer> ts;
+        ListIterator<Level> iter = this.listIterator();
+        Level ts;
         int j, i = 0;
         
         while (iter.hasNext()) {
@@ -44,8 +44,8 @@ public class NonterminalLevels extends LinkedList<TreeSet<Integer>>{
     
     // TODO: implement this
     public void print() {
-        ListIterator<TreeSet<Integer>> iter =  this.listIterator(this.size());
-        TreeSet<Integer> ts;
+        ListIterator<Level> iter =  this.listIterator(this.size());
+        Level ts;
         SymbolicTable st = pGrammar.getpSymTable();
         while ( iter.hasPrevious() ) {
             ts = iter.previous();
