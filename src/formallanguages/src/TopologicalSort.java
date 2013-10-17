@@ -1,7 +1,7 @@
 package formallanguages.src;
 
+import formallanguages.src.NonterminalLevels.Level;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.TreeSet;
 
@@ -11,12 +11,18 @@ import java.util.TreeSet;
  */
 public class TopologicalSort {
     
-    public static int[][] sort(RulesTable ruleTable, int[] nonTermBounds) {
-        LinkedList<TreeSet<Integer>> levels = new LinkedList<TreeSet<Integer>>();
-        TreeSet<Integer> ts = new TreeSet();
+    public static NonterminalLevels sort(Grammar grammar) {
+        RulesTable ruleTable = grammar.getpRulesTable();
+        int[] nonTermBounds = grammar.getpSymTable().getpNbounds();
+        NonterminalLevels levels = new NonterminalLevels();
+        // link grammar and Nonterminal levels
+        levels.setGrammar(grammar);
+        grammar.setNlvls(levels);
+        
+        Level ts = levels.new Level();
         int[][] relation = createRelation(ruleTable, nonTermBounds, ts);
         
-        TreeSet<Integer> tsnew;
+        Level tsnew;
         Iterator<Integer> iter;
         ListIterator<TreeSet<Integer>> liter;
         int [] temp;
@@ -24,7 +30,7 @@ public class TopologicalSort {
         int nonterm;
         
         do {
-            tsnew = new TreeSet();
+            tsnew = levels.new Level();
             iter = ts.iterator();
             levels.add(ts);
             while (iter.hasNext()) {
@@ -33,18 +39,22 @@ public class TopologicalSort {
                 current = 0;
                 while ( (nonterm = temp[current]) != -1) {
                     tsnew.add(nonterm);
-                    // delete
-                    liter = levels.listIterator(levels.size());
-                    while ( liter.hasPrevious() ) {
-                        if ( liter.previous().remove(nonterm) ) break;
-                    }
                     current ++;
+                }
+            }
+            // delete
+            iter = tsnew.iterator();
+            while ( iter.hasNext() ) {
+                nonterm = iter.next();
+                liter = levels.listIterator(levels.size());
+                while ( liter.hasPrevious() ) {
+                    if ( liter.previous().remove(nonterm) ) break;
                 }
             }
             ts = tsnew;
         } while ( !ts.isEmpty() );
         
-        return transformToArray(levels);
+        return levels;
     }
     
     private static int[][] createRelation(RulesTable ruleTable, int[] nonTermBounds, TreeSet l0) {
@@ -92,25 +102,6 @@ public class TopologicalSort {
             i ++;
         }
         relation[i] = code;
-    }
-    
-    private static int[][] transformToArray(LinkedList<TreeSet<Integer>> levels) {
-        int[][] result  = new int[levels.size()][];
-        ListIterator<TreeSet<Integer>> iter = levels.listIterator();
-        TreeSet<Integer> ts;
-        int j, i = 0;
-        
-        while (iter.hasNext()) {
-            ts = iter.next();
-            result[i] = new int[ts.size()];
-            j = 0;
-            for (int integer : ts) {
-                result[i][j++] = integer + SymbolicTable.OFFSET; 
-            }
-            i ++;
-        }
-        
-        return result;
     }
     
 }
