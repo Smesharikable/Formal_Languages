@@ -21,6 +21,7 @@ public class TopologicalSort {
         
         Level ts = levels.new Level();
         int[][] relation = createRelation(ruleTable, nonTermBounds, ts);
+        grammar.setRelationTable(relation);
         
         Level tsnew;
         Iterator<Integer> iter;

@@ -29,11 +29,12 @@ public class ReadGrammar {
         result.print();
         
         gr.printRules();
-        System.out.println();
+        gr.printRelationTable();
         
         boolean b = gr.regularize();
         if (b) {
             gr.printRules();
+            gr.printSortedRules();
         }
     }
 }

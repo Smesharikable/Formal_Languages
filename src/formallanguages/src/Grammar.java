@@ -9,10 +9,12 @@ import java.util.ListIterator;
  * @author Ilya Shkuratov
  */
 public class Grammar {
-    SymbolicTable pSymTable;
-    RulesTable pRulesTable;
-    NonterminalLevels pNlvls;
+    private SymbolicTable pSymTable;
+    private RulesTable pRulesTable;
+    private NonterminalLevels pNlvls;
+    private int[][] pRelationTable;
 
+    
     public Grammar(SymbolicTable pSymTable, RulesTable pRulesTable) {
         this.pSymTable = pSymTable;
         this.pRulesTable = pRulesTable;
@@ -32,20 +34,62 @@ public class Grammar {
         int[] rule;
         int j;
         
+        System.out.println("Grammar rules table.");
         for (int i = 0; i < count; i++) {
             rule = pRulesTable.getRule(i);
             j = 0;
+            System.out.print(pSymTable.getNonTerm(i + SymbolicTable.OFFSET) + ": ");
             while (rule[j] != SymbolicTable.DOT) {
                 System.out.print(pSymTable.getNonTerm(rule[j]));
                 j ++;
             }
             System.out.println(pSymTable.getNonTerm(rule[j]));
         }
+        System.out.println();
+    }
+    
+    public void printSortedRules() {
+        int[] rule;
+        
+        ListIterator<Level> iter = pNlvls.listIterator(pNlvls.size());
+        int index;
+        
+        System.out.println("Sorted Grammar rules table.");
+        while ( iter.hasPrevious() ) {
+            for (int code : iter.previous()) {
+                System.out.print(pSymTable.getNonTerm(code + SymbolicTable.OFFSET) + ": ");
+                index = 0;
+                rule = pRulesTable.getRule(code);
+                while (rule[index] != SymbolicTable.DOT) {
+                    System.out.print(pSymTable.getNonTerm(rule[index]));
+                    index ++;
+                }
+                System.out.println(pSymTable.getNonTerm(rule[index]));
+            }
+        }
+        System.out.println();
+    }
+    
+    public void printRelationTable() {
+        if (pRelationTable == null) return;
+        System.out.println("Nonterminal relation table.");
+        for (int i = 0; i < pRelationTable.length; i++) {
+            int[] is = pRelationTable[i];
+            System.out.print(pSymTable.getNonTerm(i + SymbolicTable.OFFSET) + ": ");
+            for (int j = 0; j < is.length; j++) {
+                if (is[j] != -1)
+                    System.out.print(pSymTable.getNonTerm(is[j] + SymbolicTable.OFFSET) + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
     
     // TODO: implement this
     public boolean regularize() throws TooLongRuleException {
-        if (pNlvls == null) return false;
+        if (pNlvls == null) {
+            TopologicalSort.sort(this);
+        }
         ListIterator<Level> liter = pNlvls.listIterator();
         liter.next(); // skip l0
         int[] bounds = pSymTable.getpNbounds();
@@ -79,6 +123,10 @@ public class Grammar {
     
     void setNlvls(NonterminalLevels Nlvls) {
         this.pNlvls = Nlvls;
+    }
+    
+    void setRelationTable(int[][] pRelationTable) {
+        this.pRelationTable = pRelationTable;
     }
     
     private int insertIntoRule(int[] rule, int position, int code) throws TooLongRuleException {

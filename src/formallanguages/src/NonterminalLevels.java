@@ -44,16 +44,20 @@ public class NonterminalLevels extends LinkedList<Level>{
     
     // TODO: implement this
     public void print() {
-        ListIterator<Level> iter =  this.listIterator(this.size());
+        int lvl = this.size();
+        ListIterator<Level> iter =  this.listIterator(lvl);
         Level ts;
         SymbolicTable st = pGrammar.getpSymTable();
         while ( iter.hasPrevious() ) {
             ts = iter.previous();
+            lvl --;
+            System.out.print("Level_" + lvl + ": ");
             for (int integer : ts) {
                 System.out.print(st.getNonTerm(integer + SymbolicTable.OFFSET) + " ");
             }
             System.out.println();
         }
+        System.out.println();
     }
     
     void setGrammar(Grammar grammar) {
