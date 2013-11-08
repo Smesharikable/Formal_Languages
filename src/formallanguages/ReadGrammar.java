@@ -25,15 +25,15 @@ public class ReadGrammar {
     public static void main(String[] args) 
             throws FileNotFoundException, IOException, ReadGrammarException, TooLongRuleException {
         Grammar gr = GrammarCoding.Coding(args[0]);
+        gr.printRules();
         NonterminalLevels result = TopologicalSort.sort(gr);
         result.print();
         
-        gr.printRules();
         gr.printRelationTable();
         
-        boolean b = gr.regularize();
+        boolean b = gr.regularizeAndLog("Logfile.txt");
         if (b) {
-            gr.printRules();
+//            gr.printRules();
             gr.printSortedRules();
         }
     }

@@ -20,7 +20,10 @@ public class SymbolicTable {
     
     // Nonterminal index offset
     public static final int OFFSET = 12; // must be equal to number of reseved symbols
-    public static final int DOT = 11; // must be equal to insex of '.' in SymTable
+    public static final int DOT = 11; // must be equal to index of '.' in SymTable
+    public static final int RBRACKET = 1; // must be equal to index of ')' in SymTable
+    public static final int LBRACKET = 0; // must be equal to index of '(' in SymTable
+    public static final int QUOTE = 2; // must be equal to index of '(' in SymTable
     // indexes for bounds arrays
     public static final int MIN = 0;
     public static final int CURR = 1;
@@ -74,7 +77,11 @@ public class SymbolicTable {
         return pSemCount;
     }
     
-    public String getNonTerm(int code) {
+    public String getNonTerm(int rulecode) {
+        return pSymTable[rulecode + OFFSET];
+    }
+    
+    public String getSymbol(int code) {
         return pSymTable[code];
     }
     

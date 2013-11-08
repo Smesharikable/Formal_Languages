@@ -109,7 +109,8 @@ public enum Cfr_dfa {
     }
     
     public static boolean isTerminal(char c) {
-        if (Character.isLowerCase(c) || Character.isDigit(c) || isAdditional(c))
+        if (Character.isLowerCase(c) || Character.isDigit(c) || isAdditional(c) ||
+                c == '+' || c == '(' || c == ')' || c == '.' || c == '\\')
             return true;
         return false;
     }

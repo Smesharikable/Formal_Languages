@@ -28,7 +28,7 @@ public class GrammarCoding {
     private static int pNontermCount = 100;
     private static int pTermCount = 50;
     private static int pSemCount = 50;
-    private static int pMaxRegLength = 50;
+    private static int pMaxRegLength = 150;
     
     
     public static void setNontermCount(int NontermCount) {
@@ -43,7 +43,7 @@ public class GrammarCoding {
         pSemCount = SemCount;
     }
     
-    public static void setMaxRegLenght(int MaxRegLength) {
+    public static void setMaxRegLength(int MaxRegLength) {
         pMaxRegLength = MaxRegLength;
     }
     
@@ -125,7 +125,8 @@ public class GrammarCoding {
         return position;
     }
     
-    private static void readRightPart(char[] buf, StringBuilder sb, int position, int nonTermCode) throws ReadGrammarException, TooLongRuleException {
+    private static void readRightPart(char[] buf, StringBuilder sb, int position, int nonTermCode) 
+            throws ReadGrammarException, TooLongRuleException {
         Cfr_dfa curState = Cfr_dfa.START,
                 prevState = Cfr_dfa.START;
         char c;
@@ -161,7 +162,7 @@ public class GrammarCoding {
         if (curState != Cfr_dfa.END && position == buf.length) {
             terminate(
                     String.format(
-                    "Please, check regular expression for nonterminal '%s'.", pSymTable.getNonTerm(nonTermCode)
+                    "Please, check regular expression for nonterminal '%s'.", pSymTable.getSymbol(nonTermCode)
                     ));
         }
     }

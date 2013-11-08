@@ -7,7 +7,7 @@ import formallanguages.exceptions.TooLongRuleException;
  * @author Shuratov Ilya
  */
 public class RulesTable {
-    private int pMaxRegLength = 50;
+    private int pMaxRegLength = 400;
     private int pNontermCount = 100;
     private int[][] pRulesTable;
 
