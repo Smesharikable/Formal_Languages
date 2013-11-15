@@ -1,5 +1,6 @@
 package formallanguages.src;
 
+import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.dfa.Cfr_dfa;
 import static formallanguages.dfa.Cfr_dfa.END;
 import static formallanguages.dfa.Cfr_dfa.LINK;
@@ -65,16 +66,28 @@ public class SymbolicTable {
         return pSbounds;
     }
 
-    public int getpNontermCount() {
+    public int getpNontermMaxCount() {
         return pNontermCount;
     }
 
-    public int getpTermCount() {
+    public int getpTermMaxCount() {
         return pTermCount;
     }
 
-    public int getpSemCount() {
+    public int getpSemMaxCount() {
         return pSemCount;
+    }
+    
+    public int getpNontermCount() {
+        return pNbounds[CURR] - pNbounds[MIN];
+    }
+
+    public int getpTermCount() {
+        return pTbounds[CURR] - pTbounds[MIN];
+    }
+
+    public int getpSemCount() {
+        return pSbounds[CURR] - pSbounds[MIN];
     }
     
     public String getNonTerm(int rulecode) {
@@ -83,6 +96,19 @@ public class SymbolicTable {
     
     public String getSymbol(int code) {
         return pSymTable[code];
+    }
+    
+    public SymbolType getSymbolType(int code) throws IncorrectSymbolCodeException {
+        if (code >= pLbounds[MIN] && code <= pLbounds[MAX]) {
+            return SymbolType.GRAMMAR;
+        } else if (code >= pNbounds[MIN] && code <= pNbounds[MAX]) {
+            return SymbolType.NONTERMINAL;
+        } else if (code >= pTbounds[MIN] && code <= pTbounds[MAX]) {
+            return SymbolType.TERMINAL;
+        } else if (code >= pSbounds[MIN] && code <= pSbounds[MAX]) {
+            return SymbolType.SEMANTIC;
+        }
+        throw new IncorrectSymbolCodeException();
     }
     
     public int insertSymTable(String value, Cfr_dfa type) {
@@ -114,6 +140,9 @@ public class SymbolicTable {
         return -1;
     }
     
+    static public enum SymbolType {
+        GRAMMAR, NONTERMINAL, TERMINAL, SEMANTIC
+    }
     
     private void initBounds() {
         pNbounds[MIN] = pNbounds[CURR] =  OFFSET;

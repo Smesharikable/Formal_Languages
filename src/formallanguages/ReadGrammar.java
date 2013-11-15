@@ -2,6 +2,7 @@ package formallanguages;
 
 import formallanguages.exceptions.ReadGrammarException;
 import formallanguages.exceptions.TooLongRuleException;
+import formallanguages.src.CFRGrammar;
 import formallanguages.src.Grammar;
 import formallanguages.src.GrammarCoding;
 import formallanguages.src.NonterminalLevels;
@@ -24,7 +25,7 @@ public class ReadGrammar {
      */
     public static void main(String[] args) 
             throws FileNotFoundException, IOException, ReadGrammarException, TooLongRuleException {
-        Grammar gr = GrammarCoding.Coding(args[0]);
+        CFRGrammar gr = (CFRGrammar) GrammarCoding.Coding(args[0]);
         gr.printRules();
         NonterminalLevels result = TopologicalSort.sort(gr);
         result.print();

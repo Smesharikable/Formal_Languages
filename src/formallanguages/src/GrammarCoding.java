@@ -98,7 +98,7 @@ public class GrammarCoding {
         }
         
         br.close();
-        return new Grammar(pSymTable, pRulesTable);
+        return new CFRGrammar(pSymTable, pRulesTable);
     }
     
     
