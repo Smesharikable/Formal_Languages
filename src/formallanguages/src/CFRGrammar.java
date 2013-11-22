@@ -121,6 +121,22 @@ public class CFRGrammar extends Grammar{
         return true;
     }
     
+    private int insertIntoRuleAllBrackets(int[] rule, int position, int code) 
+            throws TooLongRuleException {
+        int[] src = pRulesTable.getRule(code - SymbolicTable.OFFSET);
+        int i = 0;
+        try {
+                rule[position ++] = SymbolicTable.LBRACKET;
+                while (i < src.length && src[i] != SymbolicTable.DOT) {
+                    rule[position ++] = src[i ++];
+                }
+                rule[position ++] = SymbolicTable.RBRACKET;
+        } catch (IndexOutOfBoundsException ex) {
+            throw new TooLongRuleException("Please, increase max length of rule in RulesTable");
+        }
+        return position;
+    }
+    
     private int insertIntoRule(int[] rule, int position, int code, boolean flag) 
             throws TooLongRuleException {
         int[] src = pRulesTable.getRule(code - SymbolicTable.OFFSET);

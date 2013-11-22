@@ -11,6 +11,7 @@ import java.util.TreeSet;
 public class FirstSet extends TreeSet<Integer[]> {
     // set referenced to be full if it hasn't changed after last concatenation
     private int elementCapacity = 1;
+    private boolean full = false;
 
 
     FirstSet(int elemCapacity) {
@@ -31,57 +32,73 @@ public class FirstSet extends TreeSet<Integer[]> {
     public int getElementCapacity() {
         return elementCapacity;
     }
+
+    public boolean isFull() {
+        return full;
+    }
+    
+    /**
+     *
+     * @param addSet - set wich will be join
+     * @return true - if at least one new element has been added
+     */
+    public boolean join(FirstSet addSet) {
+        boolean isNew = true;
+        for (Integer[] integers : addSet) {
+            isNew &= this.add(integers);
+        }
+        return isNew;
+    }
     
     /**
      * Concatanate two sets into another with k as max length of elements
      * 
      * @param k - max length of elements
      * @param set1 - base set to concatenate
-     * @param addSet - addition set to concatenate
+     * @param set2  - addition set
      * @return
      */
-    public boolean Concatenate(FirstSet addSet) {
+    static public FirstSet Concatenate(int k, FirstSet set1, FirstSet set2) {
+        FirstSet result = new FirstSet(k);
         Integer[] temp;
-        boolean exist;
-        boolean full = false;
         int rest;
         int unfilled = 0;
         int j;
         int p = 0;
-        for (Integer[] first : this) {
+        for (Integer[] first : set1) {
             // find end of chain
             rest = 0;
-            for (int i = 0; i < elementCapacity; i++) {
+            for (int i = 0; i < k; i++) {
                 if (first[rest] != 0) {
                     rest++;
                 }
             }
             // if chain is full, just add it into new set
-            if (rest == elementCapacity) {
-                temp = new Integer[elementCapacity];
-                System.arraycopy(first, 0, temp, 0, elementCapacity);
-                this.add(temp);
+            if (rest == k) {
+                temp = new Integer[k];
+                System.arraycopy(first, 0, temp, 0, k);
+                result.add(temp);
                 break;
             }
             // concatenate with second set
-            for (Integer[] second : addSet) {
-                temp = new Integer[elementCapacity];
+            for (Integer[] second : set2) {
+                temp = new Integer[k];
                 System.arraycopy(first, 0, temp, 0, rest);
-                for (j = rest; j < elementCapacity && p!= second.length && second[p] != 0; j ++) {
+                for (j = rest; j < k && p != second.length && second[p] != 0; j ++) {
                     temp[j] = second[p++];
                 }
+                result.add(temp);
                 // TODO: check this statemant
-                exist = this.add(temp);
-                if (!exist && j != elementCapacity) {
+                if (j != k) {
                     unfilled++;
                 }
                 p = 0;
             }
         }
-        if (unfilled != 0) {
-            full = true;
+        if (unfilled == 0) {
+            result.full = true;
         }
-        return full;
+        return result;
     }
     
 }

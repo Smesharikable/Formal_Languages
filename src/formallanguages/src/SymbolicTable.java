@@ -22,9 +22,10 @@ public class SymbolicTable {
     // Nonterminal index offset
     public static final int OFFSET = 12; // must be equal to number of reseved symbols
     public static final int DOT = 11; // must be equal to index of '.' in SymTable
-    public static final int RBRACKET = 1; // must be equal to index of ')' in SymTable
     public static final int LBRACKET = 0; // must be equal to index of '(' in SymTable
+    public static final int RBRACKET = 1; // must be equal to index of ')' in SymTable
     public static final int QUOTE = 2; // must be equal to index of '(' in SymTable
+    public static final int SEMICOLON = 3; // must be equal to index of ';' in SymTable
     // indexes for bounds arrays
     public static final int MIN = 0;
     public static final int CURR = 1;
