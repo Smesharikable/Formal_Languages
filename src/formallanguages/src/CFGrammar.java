@@ -2,6 +2,7 @@ package formallanguages.src;
 
 import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.exceptions.IncorrectSymbolTypeException;
+import formallanguages.exceptions.UnexpectedSymbolException;
 
 /**
  *
@@ -9,15 +10,27 @@ import formallanguages.exceptions.IncorrectSymbolTypeException;
  */
 public class CFGrammar extends Grammar {
     private FirstTable firstTable;
+    private int k = 1;
     
     public CFGrammar(SymbolicTable pSymTable, RulesTable pRulesTable) {
         super(pSymTable, pRulesTable);
     }
     
-    FirstSet getFirst(int k, int[] form) 
-            throws IncorrectSymbolCodeException, IncorrectSymbolTypeException {
-        if (firstTable == null || firstTable.getChainLen() != k) {
+    public void initFirstTable(int k) 
+            throws IncorrectSymbolCodeException, IncorrectSymbolTypeException, 
+            UnexpectedSymbolException {
+        if (firstTable == null || this.k != k) {
+            this.k = k;
             firstTable = new FirstTable(this, k);
+            firstTable.init();
+        }
+    }
+    
+    public FirstSet getFirst(int[] form) 
+            throws IncorrectSymbolCodeException, IncorrectSymbolTypeException, 
+            UnexpectedSymbolException {
+        if (firstTable == null) {
+            initFirstTable(k);
             return firstTable.First(form);
         }
         else {
@@ -25,10 +38,11 @@ public class CFGrammar extends Grammar {
         }
     }
     
-    FirstSet getFirst(int k, int code) 
-            throws IncorrectSymbolCodeException, IncorrectSymbolTypeException {
-        if (firstTable == null || firstTable.getChainLen() != k) {
-            firstTable = new FirstTable(this, k);
+    public FirstSet getFirst(int code) 
+            throws IncorrectSymbolCodeException, IncorrectSymbolTypeException,
+            UnexpectedSymbolException {
+        if (firstTable == null) {
+            initFirstTable(k);
             return firstTable.First(code);
         }
         else {

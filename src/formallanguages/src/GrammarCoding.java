@@ -13,6 +13,7 @@ import static formallanguages.dfa.CfrRule_dfa.NONTERMINAL;
 import static formallanguages.dfa.CfrRule_dfa.START;
 import static formallanguages.dfa.CfrRule_dfa.WHITESPACES;
 import formallanguages.dfa.Cfr_dfa;
+import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.exceptions.ReadGrammarException;
 import formallanguages.exceptions.TooLongRuleException;
 
@@ -20,6 +21,7 @@ import formallanguages.exceptions.TooLongRuleException;
  *
  * @author Ilya Shkuratov
  * 
+ * TODO: implement verificator for CFG
  */
 public class GrammarCoding {
     private static SymbolicTable pSymTable;
@@ -56,10 +58,12 @@ public class GrammarCoding {
      * @throws FileNotFoundException
      * @throws IOException
      * @throws ReadGrammarException
-     * @throws TooLongRuleException  
+     * @throws TooLongRuleException
+     * @throws IncorrectSymbolCodeException  
      */
     public static Grammar Coding(String filename) 
-            throws FileNotFoundException, IOException, ReadGrammarException, TooLongRuleException {
+            throws FileNotFoundException, IOException, ReadGrammarException, 
+            TooLongRuleException, IncorrectSymbolCodeException {
         FileInputStream fis = new FileInputStream(filename);
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(fis, Charset.forName("UTF-8"))
@@ -73,6 +77,7 @@ public class GrammarCoding {
         StringBuilder sb = new StringBuilder(20);
         pSymTable = new SymbolicTable(pNontermCount, pTermCount, pSemCount);
         pRulesTable = new RulesTable(pNontermCount, pMaxRegLength);
+        String type = br.readLine();
                 
         while ( (line = br.readLine()) != null ) {
             
@@ -98,7 +103,11 @@ public class GrammarCoding {
         }
         
         br.close();
-        return new CFRGrammar(pSymTable, pRulesTable);
+        if (type.equals("CFRG")) {
+            return new CFRGrammar(pSymTable, pRulesTable);
+        } else if (type.equals("CFG")) {
+            return new CFGrammar(pSymTable, pRulesTable);
+        } else return null;
     }
     
     
@@ -126,7 +135,7 @@ public class GrammarCoding {
     }
     
     private static void readRightPart(char[] buf, StringBuilder sb, int position, int nonTermCode) 
-            throws ReadGrammarException, TooLongRuleException {
+            throws ReadGrammarException, TooLongRuleException, IncorrectSymbolCodeException {
         Cfr_dfa curState = Cfr_dfa.START,
                 prevState = Cfr_dfa.START;
         char c;
@@ -150,7 +159,9 @@ public class GrammarCoding {
                 if (code == -1) {
                     terminate("Symbolic table is full, increase number of Nonternminals");
                 }
-                current = pRulesTable.insert(nonTermCode, code, current);
+                if (code != SymbolicTable.QUOTE) {
+                    current = pRulesTable.insert(nonTermCode, code, current);
+                }
             }
             sb.append(c);
             

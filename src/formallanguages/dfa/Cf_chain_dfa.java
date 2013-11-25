@@ -15,15 +15,25 @@ public enum Cf_chain_dfa {
 
         @Override
         public Cf_chain_dfa step(SymbolicTable.SymbolType type, int code) {
+            detect = false;
             switch (type) {
                 case NONTERMINAL:
                     return GRAMMAR;
                 case TERMINAL:
                     chain = new int[chainSize];
-                    detect = false;
                     chain[0] = code;
                     count = 1;
+                    if (count == chainSize) {
+                        detect = true;
+                        return GRAMMAR;
+                    }
                     return TERMINAL;
+                case GRAMMAR:
+                    if (code == SymbolicTable.EMPTY) {
+                        chain[0] = code;
+                        count = 1;
+                        return EMPTY;
+                    }
                 default:
                     System.err.println("First symbol of the rule must be TERMINAL or NONTERMINAL");
                     return ERROR;
@@ -44,6 +54,8 @@ public enum Cf_chain_dfa {
                     } else if (code == SymbolicTable.DOT) {
                         detect = true;
                         return END;
+                    } else if (code == SymbolicTable.COMMA) {
+                        return TERMINAL;
                     } else return ERROR;
                 case NONTERMINAL:
                     return GRAMMAR;
@@ -74,7 +86,10 @@ public enum Cf_chain_dfa {
                         return START;
                     } else if (code == SymbolicTable.DOT) {
                         return END;
-                    } else return ERROR;
+                    } else if (code == SymbolicTable.COMMA) {
+                        return GRAMMAR;
+                    } else
+                        return ERROR;
                 case NONTERMINAL:
                     return GRAMMAR;
                 case TERMINAL:
@@ -85,6 +100,31 @@ public enum Cf_chain_dfa {
         }
         
     },
+    
+    /**
+     * State for "empty" symbol
+     */
+    EMPTY {
+
+        @Override
+        public Cf_chain_dfa step(SymbolicTable.SymbolType type, int code) {
+            switch (type) {
+                case GRAMMAR:
+                    if (code == SymbolicTable.DOT) {
+                        detect = true;
+                        return END;
+                    }
+                    if (code == SymbolicTable.SEMICOLON) {
+                        detect = true;
+                        return START;
+                    }
+                default:
+                    System.err.println("Empty symbol must be first and single in rule.");
+                    return ERROR;
+            }
+        }
+        
+    }, 
     
     /**
      * final state of dfa
@@ -118,7 +158,9 @@ public enum Cf_chain_dfa {
     
     public static Integer[] getChain() {
         Integer[] result = new Integer[chainSize];
-        System.arraycopy(chain, 0, result, 0, chainSize);
+        for (int i = 0; i < count; i++) {
+            result[i] = chain[i];
+        }
         return result;
     }
     

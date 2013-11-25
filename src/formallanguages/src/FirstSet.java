@@ -12,22 +12,14 @@ public class FirstSet extends TreeSet<Integer[]> {
     // set referenced to be full if it hasn't changed after last concatenation
     private int elementCapacity = 1;
     private boolean full = false;
+    private static Comparator comparator = new IntArrayComparator();;
 
 
     FirstSet(int elemCapacity) {
-        super();
-        elementCapacity = elemCapacity;
-    }
-
-    FirstSet(int elemCapacity, Collection<? extends Integer[]> c) {
-        super(c);
-        elementCapacity = elemCapacity;
-    }
-
-    FirstSet(int elemCapacity, Comparator<? super Integer[]> comparator) {
         super(comparator);
         elementCapacity = elemCapacity;
     }
+
 
     public int getElementCapacity() {
         return elementCapacity;
@@ -59,6 +51,9 @@ public class FirstSet extends TreeSet<Integer[]> {
      * @return
      */
     static public FirstSet Concatenate(int k, FirstSet set1, FirstSet set2) {
+        // if first set is empty we don't know prefix of resulting chaing
+        if (set1.size() == 0 || set2.size() == 0) return set1;
+        
         FirstSet result = new FirstSet(k);
         Integer[] temp;
         int rest;
@@ -68,22 +63,31 @@ public class FirstSet extends TreeSet<Integer[]> {
         for (Integer[] first : set1) {
             // find end of chain
             rest = 0;
-            for (int i = 0; i < k; i++) {
-                if (first[rest] != 0) {
-                    rest++;
+            // if current chain id empty just add all from second set into first set
+            if (first[0] != SymbolicTable.EMPTY) {
+                for (int i = 0; i < k; i++) {
+                    if (first[rest] != 0) {
+                        rest++;
+                    }
                 }
             }
+            
             // if chain is full, just add it into new set
             if (rest == k) {
-                temp = new Integer[k];
-                System.arraycopy(first, 0, temp, 0, k);
-                result.add(temp);
-                break;
+                result.add(first);
+                continue;
             }
             // concatenate with second set
             for (Integer[] second : set2) {
+                if (second[0] == SymbolicTable.EMPTY) {
+                    result.add(first);
+                    unfilled ++;
+                    continue;
+                }
                 temp = new Integer[k];
-                System.arraycopy(first, 0, temp, 0, rest);
+                for (int i = 0; i < rest; i++) {
+                    temp[i] = first[i];
+                }
                 for (j = rest; j < k && p != second.length && second[p] != 0; j ++) {
                     temp[j] = second[p++];
                 }
@@ -99,6 +103,21 @@ public class FirstSet extends TreeSet<Integer[]> {
             result.full = true;
         }
         return result;
+    }
+    
+    private static class IntArrayComparator implements Comparator<Integer[]> {
+
+        @Override
+        public int compare(Integer[] o1, Integer[] o2) {
+            if (o1.length < o2.length) return -1;
+            if (o1.length > o2.length) return 1;
+            for (int i = 0; i < o2.length; i++) {
+                if (o1[i] < o2[i]) return -1;
+                if (o1[i] > o2[i]) return 1;
+            }
+            return 0;
+        }
+        
     }
     
 }

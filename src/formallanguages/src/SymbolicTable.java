@@ -24,8 +24,10 @@ public class SymbolicTable {
     public static final int DOT = 11; // must be equal to index of '.' in SymTable
     public static final int LBRACKET = 0; // must be equal to index of '(' in SymTable
     public static final int RBRACKET = 1; // must be equal to index of ')' in SymTable
-    public static final int QUOTE = 2; // must be equal to index of '(' in SymTable
+    public static final int QUOTE = 2; // must be equal to index of ''' in SymTable
     public static final int SEMICOLON = 3; // must be equal to index of ';' in SymTable
+    public static final int COMMA = 4; // must be equal to index of ',' in SymTable
+    public static final int EMPTY = 9; // must be equal to index of '@' in SymTable
     // indexes for bounds arrays
     public static final int MIN = 0;
     public static final int CURR = 1;
@@ -95,8 +97,38 @@ public class SymbolicTable {
         return pSymTable[rulecode + OFFSET];
     }
     
-    public String getSymbol(int code) {
+    public String getSymbol(int code) throws IncorrectSymbolCodeException {
+        if (getSymbolType(code) == SymbolType.TERMINAL) {
+            return "'" + pSymTable[code] +"'";
+        }
         return pSymTable[code];
+    }
+    
+    public int getSymbolCode(String symbol) {
+        int start, end;
+        if (symbol.startsWith("'")) {
+            start = pTbounds[MIN];
+            end = pTbounds[CURR];
+            symbol = symbol.substring(1, symbol.length() - 1);
+        } else if (symbol.startsWith("$")) {
+            start = pSbounds[MIN];
+            end = pSbounds[CURR];
+        } else {
+            start = 0;
+            end = pNbounds[CURR];
+        }
+        for (int i = start; i < end; i++) {
+            if (pSymTable[i].equals(symbol)) return i;
+        }
+        return -1;
+    }
+    
+    public int[] getFormCode(String[] symbols) {
+        int[] result = new int[symbols.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = getSymbolCode(symbols[i]);
+        }
+        return result;
     }
     
     public SymbolType getSymbolType(int code) throws IncorrectSymbolCodeException {

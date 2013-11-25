@@ -82,7 +82,8 @@ public enum Cfr_dfa {
     private static Stack<Character> st = new Stack();;
     private static Cfr_dfa state;
     private static int position;
-    
+    private static char[] termSymbols = 
+        {'+', '(', ')', '.', '*', '@', '!', '$', '%', '^', '-'};
     
     public Cfr_dfa step(char c, int position) {
             return null;
@@ -92,6 +93,13 @@ public enum Cfr_dfa {
     public static boolean isAdditional(char c) {
         if (c == ' ' || c == '_' || c == '-')
             return true;
+        return false;
+    }
+    
+    public static boolean isTermSymbols(char c) {
+        for (int i = 0; i < termSymbols.length; i++) {
+            if (c == termSymbols[i]) return true;
+        }
         return false;
     }
     
@@ -110,7 +118,7 @@ public enum Cfr_dfa {
     
     public static boolean isTerminal(char c) {
         if (Character.isLowerCase(c) || Character.isDigit(c) || isAdditional(c) ||
-                c == '+' || c == '(' || c == ')' || c == '.' || c == '\\')
+                isTermSymbols(c))
             return true;
         return false;
     }

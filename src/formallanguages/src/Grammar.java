@@ -1,5 +1,6 @@
 package formallanguages.src;
 
+import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.src.NonterminalLevels.Level;
 import java.util.ListIterator;
 
@@ -27,7 +28,8 @@ public class Grammar {
         return pSymTable;
     }
     
-    public void printRules() {
+    public void printRules() 
+            throws IncorrectSymbolCodeException {
         int[] bounds = pSymTable.getpNbounds();
         int count = bounds[SymbolicTable.CURR] - bounds[SymbolicTable.MIN];
         int[] rule;
@@ -52,7 +54,8 @@ public class Grammar {
      * @param code - Nonterminal grammar code
      * @return String representation of grammar rule
      */
-    public String getRuleAsString(int code) {
+    public String getRuleAsString(int code) 
+            throws IncorrectSymbolCodeException {
         StringBuilder sb = new StringBuilder();
         int[] rule;
         int j = 0;
@@ -68,7 +71,8 @@ public class Grammar {
         return sb.toString();
     }
     
-    public void printSortedRules() {
+    public void printSortedRules() 
+            throws IncorrectSymbolCodeException {
         int[] rule;
         
         ListIterator<Level> iter = pNlvls.listIterator(pNlvls.size());

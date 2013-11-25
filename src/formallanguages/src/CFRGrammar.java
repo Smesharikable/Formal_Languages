@@ -1,5 +1,6 @@
 package formallanguages.src;
 
+import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.exceptions.TooLongRuleException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -56,7 +57,8 @@ public class CFRGrammar extends Grammar{
         return true;
     }
     
-    public boolean regularizeAndLog(String filename) throws TooLongRuleException, IOException {
+    public boolean regularizeAndLog(String filename) 
+            throws TooLongRuleException, IOException, IncorrectSymbolCodeException {
         BufferedWriter br = new BufferedWriter(new FileWriter(filename));
         if (pNlvls == null) {
             TopologicalSort.sort(this);
