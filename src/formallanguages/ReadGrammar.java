@@ -59,5 +59,8 @@ public class ReadGrammar {
         form[1] = st.getSymbolCode("'+'");
         String[] input = {"T1","'+'"};
         fs = gr.getFirst(st.getFormCode(input));
+        System.out.println(gr.getFirstAsString(fs));
+        fs = gr.getFollow("T1", 1);
+        System.out.println(gr.getFirstAsString(fs));
     }
 }

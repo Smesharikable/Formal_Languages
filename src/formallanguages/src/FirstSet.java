@@ -1,6 +1,5 @@
 package formallanguages.src;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 
@@ -35,9 +34,9 @@ public class FirstSet extends TreeSet<Integer[]> {
      * @return true - if at least one new element has been added
      */
     public boolean join(FirstSet addSet) {
-        boolean isNew = true;
+        boolean isNew = false;
         for (Integer[] integers : addSet) {
-            isNew &= this.add(integers);
+            isNew |= this.add(integers);
         }
         return isNew;
     }

@@ -97,7 +97,7 @@ public class SymbolicTable {
         return pSymTable[rulecode + OFFSET];
     }
     
-    public String getSymbol(int code) throws IncorrectSymbolCodeException {
+    public String getSymbol(int code) {
         if (getSymbolType(code) == SymbolType.TERMINAL) {
             return "'" + pSymTable[code] +"'";
         }
@@ -131,7 +131,7 @@ public class SymbolicTable {
         return result;
     }
     
-    public SymbolType getSymbolType(int code) throws IncorrectSymbolCodeException {
+    public SymbolType getSymbolType(int code) {
         if (code >= pLbounds[MIN] && code <= pLbounds[MAX]) {
             return SymbolType.GRAMMAR;
         } else if (code >= pNbounds[MIN] && code <= pNbounds[MAX]) {
@@ -141,7 +141,7 @@ public class SymbolicTable {
         } else if (code >= pSbounds[MIN] && code <= pSbounds[MAX]) {
             return SymbolType.SEMANTIC;
         }
-        throw new IncorrectSymbolCodeException();
+        return SymbolType.ERROR;
     }
     
     public int insertSymTable(String value, Cfr_dfa type) {
@@ -174,7 +174,7 @@ public class SymbolicTable {
     }
     
     static public enum SymbolType {
-        GRAMMAR, NONTERMINAL, TERMINAL, SEMANTIC
+        GRAMMAR, NONTERMINAL, TERMINAL, SEMANTIC, ERROR
     }
     
     private void initBounds() {
