@@ -1,11 +1,8 @@
 package formallanguages.src;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import formallanguages.dfa.CfrRule_dfa;
 import static formallanguages.dfa.CfrRule_dfa.END;
 import static formallanguages.dfa.CfrRule_dfa.ERROR;
@@ -13,9 +10,13 @@ import static formallanguages.dfa.CfrRule_dfa.NONTERMINAL;
 import static formallanguages.dfa.CfrRule_dfa.START;
 import static formallanguages.dfa.CfrRule_dfa.WHITESPACES;
 import formallanguages.dfa.Cfr_dfa;
+import static formallanguages.dfa.Cfr_dfa.LINK;
 import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.exceptions.ReadGrammarException;
 import formallanguages.exceptions.TooLongRuleException;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileReader;
 
 /**
  *
@@ -49,11 +50,35 @@ public class GrammarCoding {
         pMaxRegLength = MaxRegLength;
     }
     
+    public static Grammar CodingFromFile(File grammarFile) 
+            throws FileNotFoundException, IOException, 
+            ReadGrammarException, TooLongRuleException, 
+            IncorrectSymbolCodeException {
+        BufferedReader input = new BufferedReader(new FileReader(grammarFile));
+        return Coding(input);
+    }
+    
+    public static Grammar CodingFromFile(String grammarFile) 
+            throws FileNotFoundException, IOException, 
+            ReadGrammarException, TooLongRuleException, 
+            IncorrectSymbolCodeException {
+        BufferedReader input = new BufferedReader(new FileReader(grammarFile));
+        return Coding(input);
+    }
+    
+    public static Grammar CodingFromFile(FileDescriptor grammarFile) 
+            throws FileNotFoundException, IOException, 
+            ReadGrammarException, TooLongRuleException, 
+            IncorrectSymbolCodeException {
+        BufferedReader input = new BufferedReader(new FileReader(grammarFile));
+        return Coding(input);
+    }
+    
     /**
      * Read grammar from specified file and code 
      * nonterminals, terminals and rules of this grammar.
      * 
-     * @param filename - file with grammar
+     * @param input - buffered reader with input grammar
      * @return 
      * @throws FileNotFoundException
      * @throws IOException
@@ -61,14 +86,9 @@ public class GrammarCoding {
      * @throws TooLongRuleException
      * @throws IncorrectSymbolCodeException  
      */
-    public static Grammar Coding(String filename) 
-            throws FileNotFoundException, IOException, ReadGrammarException, 
+    public static Grammar Coding(BufferedReader input) 
+            throws IOException, ReadGrammarException, 
             TooLongRuleException, IncorrectSymbolCodeException {
-        FileInputStream fis = new FileInputStream(filename);
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(fis, Charset.forName("UTF-8"))
-                );
-        
         char[] buf;
         int position;
         int code;
@@ -77,9 +97,9 @@ public class GrammarCoding {
         StringBuilder sb = new StringBuilder(20);
         pSymTable = new SymbolicTable(pNontermCount, pTermCount, pSemCount);
         pRulesTable = new RulesTable(pNontermCount, pMaxRegLength);
-        String type = br.readLine();
+        String type = input.readLine();
                 
-        while ( (line = br.readLine()) != null ) {
+        while ( (line = input.readLine()) != null ) {
             
             sb.delete(0, sb.length());
             buf = line.toCharArray();
@@ -102,10 +122,10 @@ public class GrammarCoding {
             readRightPart(buf, sb, position, code - SymbolicTable.OFFSET);
         }
         
-        br.close();
-        if (type.equals("CFRG")) {
+        input.close();
+        if (type.equals(Grammar.CFRG)) {
             return new CFRGrammar(pSymTable, pRulesTable);
-        } else if (type.equals("CFG")) {
+        } else if (type.equals(Grammar.CFG)) {
             return new CFGrammar(pSymTable, pRulesTable);
         } else return null;
     }
@@ -146,29 +166,149 @@ public class GrammarCoding {
         while (Character.isSpaceChar(buf[position])) {
             position ++;
         }
-        prevState = curState = curState.step(buf[position], position);
-        sb.append(buf[position ++]);
+//        prevState = curState = curState.step(buf[position], position);
+//        sb.append(buf[position ++]);
+//        
+//        while (curState != Cfr_dfa.ERROR && curState != Cfr_dfa.END && position < buf.length) {
+//            c = buf[position];
+//            
+//            curState = curState.step(c, position ++);
+//            if (curState != prevState || prevState == Cfr_dfa.START) {
+//                code = pSymTable.insertSymTable(sb.toString(), prevState);
+//                sb.delete(0, sb.length());
+//                if (code == -1) {
+//                    terminate("Symbolic table is full, increase number of Nonternminals");
+//                }
+//                if (code != SymbolicTable.QUOTE) {
+//                    current = pRulesTable.insert(nonTermCode, code, current);
+//                    sb.append(c);
+//                }
+//            } else {
+//                sb.append(c);
+//            }
+//            
+//            prevState = curState;
+//        }
         
+        
+        boolean inter = false;
         while (curState != Cfr_dfa.ERROR && curState != Cfr_dfa.END && position < buf.length) {
+            // do step and read current symbol
+            if (sb.length() > 0) inter = true;
+            
             c = buf[position];
-            
-            curState = curState.step(c, position ++);
-            if (curState != prevState || prevState == Cfr_dfa.START) {
-                code = pSymTable.insertSymTable(sb.toString(), prevState);
-                sb.delete(0, sb.length());
-                if (code == -1) {
-                    terminate("Symbolic table is full, increase number of Nonternminals");
-                }
-                if (code != SymbolicTable.QUOTE) {
-                    current = pRulesTable.insert(nonTermCode, code, current);
-                }
-            }
             sb.append(c);
+            curState = curState.step(c, position++);
             
+            if (prevState == Cfr_dfa.START) {
+                if (inter) {
+                    code = pSymTable.insertSymTable(sb.substring(0, sb.length() - 1), prevState);
+                    current = pRulesTable.insert(nonTermCode, code, current);
+                    sb.delete(0, sb.length() - 1);
+                }
+                switch (curState) {
+                    // match bracket or empty symbol
+                    case START: case LINK:
+                        code = pSymTable.insertSymTable(sb.toString(), curState);
+                        sb.delete(0, sb.length());
+                        current = pRulesTable.insert(nonTermCode, code, current);
+                        break;
+                    // start of terminal, delete quote
+                    case QUOTES:
+                        sb.deleteCharAt(sb.length() - 1);
+                        break;
+                    // start of nonterminal or semantic, contunue matching
+                    case NONTERMINAL:
+                        break;
+                    case SEMANTIC:
+                        sb.deleteCharAt(sb.length() - 1);
+                        break;
+                    default:
+                        break;
+                }
+            } else if (curState != prevState) {
+                switch (prevState) {
+                    case QUOTES:
+                        // math empty symbol
+                        if (curState == Cfr_dfa.LINK) {
+                            sb.delete(0, sb.length());
+                            current = pRulesTable.insert(nonTermCode, SymbolicTable.EMPTY, current);
+                        } else if (curState == Cfr_dfa.TERMINAL) {
+                            // quote has been deleted already, continue matching Terminal
+//                            sb.deleteCharAt(sb.length() - 1);
+                        }
+                        break;
+                    case TERMINAL:
+                        // match terminal
+                        if (curState == Cfr_dfa.LINK) {
+                            sb.deleteCharAt(sb.length() - 1);
+                            code = pSymTable.insertSymTable(sb.toString(), prevState);
+                            current = pRulesTable.insert(nonTermCode, code, current);
+                            sb.delete(0, sb.length());
+                        }
+                        // if Terminal then continue matching
+                        break;
+                    case NONTERMINAL: case SEMANTIC:
+                        // match Nonterminal
+                        if (curState == Cfr_dfa.START) {
+                            code = pSymTable.insertSymTable(sb.substring(0, sb.length() - 1), prevState);
+                            current = pRulesTable.insert(nonTermCode, code, current);
+                            sb.delete(0, sb.length() - 1);
+                        } else if (curState == Cfr_dfa.END) {
+                            if (sb.length() > 1) {
+                                code = pSymTable.insertSymTable(sb.substring(0, sb.length() - 1), prevState);
+                                current = pRulesTable.insert(nonTermCode, code, current);
+                            }
+                            sb.delete(0, sb.length());
+                            // insert DOT
+                            current = pRulesTable.insert(nonTermCode, SymbolicTable.DOT, current);
+                        // match bracket
+                        } else if (curState == Cfr_dfa.LINK) {
+                            // insert Nonterminal, Semantic ot Link
+                            code = pSymTable.insertSymTable(sb.substring(0, sb.length() - 1), prevState);
+                            current = pRulesTable.insert(nonTermCode, code, current);
+                            sb.delete(0, sb.length() - 1);
+                            // insert Bracket
+                            code = pSymTable.insertSymTable(sb.toString(), curState);
+                            current = pRulesTable.insert(nonTermCode, code, current);
+                            sb.delete(0, sb.length());
+                        }
+                        // if Nonterminal then continue matching 
+                        // if Semantic then continue matching
+                        break;
+                    case LINK:
+                        if (curState == Cfr_dfa.START) {
+                        } else if (curState == Cfr_dfa.END) {
+                            if (sb.length() > 1) {
+                                code = pSymTable.insertSymTable(sb.substring(0, sb.length() - 1), prevState);
+                                current = pRulesTable.insert(nonTermCode, code, current);
+                            }
+                            sb.delete(0, sb.length());
+                            // insert DOT
+                            current = pRulesTable.insert(nonTermCode, SymbolicTable.DOT, current);
+                        } 
+                        break;
+                    default:
+                        break;
+                } 
+            } if (prevState == Cfr_dfa.LINK && curState == Cfr_dfa.LINK) {
+                // match bracket
+                if (sb.length() > 1) {
+                    code = pSymTable.insertSymTable(sb.substring(0, sb.length() - 1), prevState);
+                    current = pRulesTable.insert(nonTermCode, code, current);
+                    sb.delete(0, sb.length() - 1);
+                }
+                // insert Bracket
+                code = pSymTable.insertSymTable(sb.toString(), curState);
+                current = pRulesTable.insert(nonTermCode, code, current);
+                sb.delete(0, sb.length());
+            }
             prevState = curState;
+            inter = false;
         }
         
-        pRulesTable.insert(nonTermCode, pSymTable.insertSymTable(sb.toString(), curState), current);
+//        pRulesTable.insert(nonTermCode, pSymTable.insertSymTable(sb.toString(), curState), current);
+//        pRulesTable.insert(nonTermCode, pSymTable.insertSymTable(sb.toString(), curState), current);
         
         if (curState != Cfr_dfa.END && position == buf.length) {
             terminate(

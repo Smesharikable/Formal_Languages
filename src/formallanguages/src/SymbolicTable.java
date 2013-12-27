@@ -1,6 +1,5 @@
 package formallanguages.src;
 
-import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.dfa.Cfr_dfa;
 import static formallanguages.dfa.Cfr_dfa.END;
 import static formallanguages.dfa.Cfr_dfa.LINK;
@@ -33,7 +32,7 @@ public class SymbolicTable {
     public static final int CURR = 1;
     public static final int MAX = 2;
     // {minimal index, current insex, maximal index}
-    private int[] pLbounds = {0, 11, 11};
+    private int[] pLbounds = {0, 12, 11};
     private int[] pNbounds = new int[3];
     private int[] pTbounds = new int[3];
     private int[] pSbounds = new int[3];
@@ -93,15 +92,24 @@ public class SymbolicTable {
         return pSbounds[CURR] - pSbounds[MIN];
     }
     
-    public String getNonTerm(int rulecode) {
+    public String getNonTermByRuleCode(int rulecode) {
         return pSymTable[rulecode + OFFSET];
     }
     
     public String getSymbol(int code) {
         if (getSymbolType(code) == SymbolType.TERMINAL) {
             return "'" + pSymTable[code] +"'";
+        } else {
+            return pSymTable[code];
         }
-        return pSymTable[code];
+    }
+    
+    public String getTerminalWithoutBrackets(int code) {
+        if (getSymbolType(code) == SymbolType.TERMINAL ||
+                code == EMPTY) {
+            return pSymTable[code];
+        }
+        return "";
     }
     
     public int getSymbolCode(String symbol) {

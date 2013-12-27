@@ -83,7 +83,7 @@ public enum Cfr_dfa {
     private static Cfr_dfa state;
     private static int position;
     private static char[] termSymbols = 
-        {'+', '(', ')', '.', '*', '@', '!', '$', '%', '^', '-'};
+        {'+', '(', ')', '.', '*', '@', '!', '$', '%', '^', '-', '\\', '|', '<', '>'};
     
     public Cfr_dfa step(char c, int position) {
             return null;

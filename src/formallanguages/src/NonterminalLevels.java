@@ -42,26 +42,23 @@ public class NonterminalLevels extends LinkedList<Level>{
         return result;
     }
     
-    // TODO: implement this
-    public void print() {
+    public StringBuilder print(StringBuilder sb) {
         int lvl = this.size();
         ListIterator<Level> iter =  this.listIterator(lvl);
         Level ts;
         SymbolicTable st = pGrammar.getpSymTable();
-        StringBuilder sb = new StringBuilder();
         while ( iter.hasPrevious() ) {
             ts = iter.previous();
             lvl --;
-            sb.append("S").append(lvl).append("= (");
+            sb.append("S").append(lvl).append(" = {");
             for (int integer : ts) {
-                sb.append(st.getNonTerm(integer)).append(", ");
+                sb.append(st.getNonTermByRuleCode(integer)).append(", ");
             }
             sb.delete(sb.length() - 2, sb.length());
-            sb.append(")\n");
-            System.out.print(sb.toString());
-            sb.delete(0, sb.length());
+            sb.append("}").append(pGrammar.eol);
         }
-        System.out.println();
+        sb.append(pGrammar.eol);
+        return sb;
     }
     
     void setGrammar(Grammar grammar) {

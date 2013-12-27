@@ -44,9 +44,13 @@ class FirstTable {
         SymbolicTable st = grammar.pSymTable;
         int position = 0;
         
+        // Create extended form with DOT at the end,
+        // so Cf_chain_dfa will process it properly.
+        int[] ext_form = Arrays.copyOf(form, form.length + 1);
+        ext_form[form.length] = SymbolicTable.DOT;
         // find terminal prefix
-        while (position < form.length && dfa != Cf_chain_dfa.ERROR) {
-            dfa = dfa.step(st.getSymbolType(form[position]), form[position]);
+        while (position < ext_form.length && dfa != Cf_chain_dfa.ERROR) {
+            dfa = dfa.step(st.getSymbolType(ext_form[position]), ext_form[position]);
             position ++;
         }
         if (dfa == Cf_chain_dfa.ERROR) {
@@ -131,7 +135,7 @@ class FirstTable {
             if (dfa == Cf_chain_dfa.ERROR) {
                 System.err.println(
                         String.format("Unexpected symbol in rule for Nonterminal: %s", 
-                            st.getNonTerm(i))
+                            st.getNonTermByRuleCode(i))
                         );
             } else {
                 if (Cf_chain_dfa.isDetect()) {
@@ -152,7 +156,7 @@ class FirstTable {
             for (int i = start; i < max; i++) {
                 rule = grammar.pRulesTable.getRule(i);
                 j = 0;
-                fs = First(rule[j]);
+                fs = First(rule[j++]);
                 while (rule[j] != SymbolicTable.DOT) {
                     if (rule[j] == SymbolicTable.SEMICOLON) {
                         isFull |= ft_new[i].join(fs);
@@ -178,16 +182,13 @@ class FirstTable {
         FirstSet fs = new FirstSet(chainLen);
         Integer[] chain = new Integer[chainLen];
         chain[0] = symbol;
+        for (int i = 1; i < chain.length; i++) {
+            chain[i] = 0;
+        }
         fs.add(chain);
         return fs;
     }
     
-    // TODO: implement this
-    private FirstSet FirstSetNonterminal(int symbol) {
-        FirstSet result = new FirstSet(chainLen);
-        
-        return result;
-    }
     
     private FirstSet[] getCopy() {
         FirstSet[] result = new FirstSet[firstTable.length];

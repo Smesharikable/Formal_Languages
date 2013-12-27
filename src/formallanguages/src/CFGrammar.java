@@ -1,6 +1,5 @@
 package formallanguages.src;
 
-import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.exceptions.IncorrectSymbolTypeException;
 
 /**
@@ -14,6 +13,13 @@ public class CFGrammar extends Grammar {
     
     public CFGrammar(SymbolicTable pSymTable, RulesTable pRulesTable) {
         super(pSymTable, pRulesTable);
+    }
+
+    @Override
+    public StringBuilder printGrammar(StringBuilder sb) {
+        sb.append(Grammar.CFG).append(eol);
+        sb = super.printGrammar(sb);
+        return sb;
     }
     
     public void initFirstTable(int k) {
@@ -62,12 +68,14 @@ public class CFGrammar extends Grammar {
         }
     }
     
-    public String getFirstAsString(FirstSet fs) throws IncorrectSymbolCodeException {
+    public String getFirstAsString(FirstSet fs) {
         StringBuilder sb = new StringBuilder();
         for (Integer[] form : fs) {
             for (int i = 0; i < form.length; i++) {
                 int code = form[i];
-                sb.append(pSymTable.getSymbol(code));
+                if (code != 0) {
+                    sb.append(pSymTable.getTerminalWithoutBrackets(code));
+                }
             }
             sb.append(", ");
         }

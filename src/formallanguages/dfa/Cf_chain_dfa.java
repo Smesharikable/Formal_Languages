@@ -158,7 +158,7 @@ public enum Cf_chain_dfa {
     
     public static Integer[] getChain() {
         Integer[] result = new Integer[chainSize];
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < chainSize; i++) {
             result[i] = chain[i];
         }
         return result;

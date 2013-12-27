@@ -62,13 +62,14 @@ public class FirstSet extends TreeSet<Integer[]> {
         for (Integer[] first : set1) {
             // find end of chain
             rest = 0;
-            // if current chain id empty just add all from second set into first set
+            // if current chain is empty just add all from second set into first set
             if (first[0] != SymbolicTable.EMPTY) {
                 for (int i = 0; i < k; i++) {
                     if (first[rest] != 0) {
                         rest++;
                     }
                 }
+                unfilled ++;
             }
             
             // if chain is full, just add it into new set
@@ -87,14 +88,11 @@ public class FirstSet extends TreeSet<Integer[]> {
                 for (int i = 0; i < rest; i++) {
                     temp[i] = first[i];
                 }
-                for (j = rest; j < k && p != second.length && second[p] != 0; j ++) {
+                for (j = rest; j < k && p != second.length; j ++) {
+                    if (second[p] == 0) unfilled ++;
                     temp[j] = second[p++];
                 }
                 result.add(temp);
-                // TODO: check this statemant
-                if (j != k) {
-                    unfilled++;
-                }
                 p = 0;
             }
         }

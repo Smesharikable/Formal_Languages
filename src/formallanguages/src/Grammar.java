@@ -9,10 +9,15 @@ import java.util.ListIterator;
  * @author Ilya Shkuratov
  */
 public class Grammar {
+    final static public String CFRG = "CFRG";
+    final static public String CFG = "CFG";
+    
     protected SymbolicTable pSymTable;
     protected RulesTable pRulesTable;
     protected NonterminalLevels pNlvls;
     protected int[][] pRelationTable;
+    
+    protected String eol = System.getProperty("line.separator");
 
     
     public Grammar(SymbolicTable pSymTable, RulesTable pRulesTable) {
@@ -28,46 +33,48 @@ public class Grammar {
         return pSymTable;
     }
     
-    public void printRules() 
-            throws IncorrectSymbolCodeException {
+    public String printGrammar() {
+        return printGrammar(new StringBuilder()).toString();
+    }
+    
+    public StringBuilder printGrammar(StringBuilder sb) {
         int[] bounds = pSymTable.getpNbounds();
         int count = bounds[SymbolicTable.CURR] - bounds[SymbolicTable.MIN];
         int[] rule;
         int j;
         
-        System.out.println("Grammar rules table.");
         for (int i = 0; i < count; i++) {
-            rule = pRulesTable.getRule(i);
-            j = 0;
-            System.out.print(pSymTable.getNonTerm(i) + ": ");
-            while (rule[j] != SymbolicTable.DOT) {
-                System.out.print(pSymTable.getSymbol(rule[j]));
-                j ++;
-            }
-            System.out.println(pSymTable.getSymbol(rule[j]));
+//            rule = pRulesTable.getRule(i);
+//            j = 0;
+            sb.append(pSymTable.getNonTermByRuleCode(i)).append(": ");
+            sb.append(getRuleAsString(i)).append(eol);
+//            while (rule[j] != SymbolicTable.DOT) {
+//                sb.append(pSymTable.getSymbol(rule[j]));
+//                j ++;
+//            }
+//            sb.append(pSymTable.getSymbol(rule[j]));
         }
-        System.out.println();
+        sb.append(eol);
+        return sb;
     }
     
     /**
      *
      * @param code - Nonterminal grammar code
      * @return String representation of grammar rule
+     * @throws IncorrectSymbolCodeException  
      */
-    public String getRuleAsString(int code) 
-            throws IncorrectSymbolCodeException {
+    public String getRuleAsString(int code) {
         StringBuilder sb = new StringBuilder();
         int[] rule;
         int j = 0;
         
-        //code -= SymbolicTable.OFFSET;
         rule = pRulesTable.getRule(code);
-        //sb.append(pSymTable.getNonTerm(code)).append(": ");
         while (rule[j] != SymbolicTable.DOT) {
             sb.append(pSymTable.getSymbol(rule[j]));
             j ++;
         }
-        //sb.append(pSymTable.getSymbol(rule[j]));
+        sb.append(pSymTable.getSymbol(SymbolicTable.DOT));
         return sb.toString();
     }
     
@@ -81,7 +88,7 @@ public class Grammar {
         System.out.println("Sorted Grammar rules table.");
         while ( iter.hasPrevious() ) {
             for (int code : iter.previous()) {
-                System.out.print(pSymTable.getNonTerm(code) + ": ");
+                System.out.print(pSymTable.getNonTermByRuleCode(code) + ": ");
                 index = 0;
                 rule = pRulesTable.getRule(code);
                 while (rule[index] != SymbolicTable.DOT) {
@@ -94,19 +101,19 @@ public class Grammar {
         System.out.println();
     }
     
-    public void printRelationTable() {
-        if (pRelationTable == null) return;
-        System.out.println("Nonterminal relation table.");
+    public StringBuilder printRelationTable(StringBuilder sb) {
+        if (pRelationTable == null) return sb;
         for (int i = 0; i < pRelationTable.length; i++) {
             int[] is = pRelationTable[i];
-            System.out.print(pSymTable.getNonTerm(i) + ": ");
+            sb.append(pSymTable.getNonTermByRuleCode(i)).append(": ");
             for (int j = 0; j < is.length; j++) {
                 if (is[j] != -1)
-                    System.out.print(pSymTable.getNonTerm(is[j]) + " ");
+                    sb.append(pSymTable.getNonTermByRuleCode(is[j])).append(" ");
             }
-            System.out.println();
+            sb.append(eol);
         }
-        System.out.println();
+        sb.append(eol);
+        return sb;
     }
     
     

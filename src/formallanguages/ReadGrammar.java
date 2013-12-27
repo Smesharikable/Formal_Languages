@@ -36,31 +36,31 @@ public class ReadGrammar {
             throws FileNotFoundException, IOException, ReadGrammarException, 
             TooLongRuleException, IncorrectSymbolCodeException, 
             IncorrectSymbolTypeException, UnexpectedSymbolException {
-        /*
-        CFRGrammar gr = (CFRGrammar) GrammarCoding.Coding(args[0]);
-        gr.printRules();
-        NonterminalLevels result = TopologicalSort.sort(gr);
-        result.print();
         
-        gr.printRelationTable();
+//        CFRGrammar gr = (CFRGrammar) GrammarCoding.CodingFromFile(args[0]);
+//        gr.printGrammar();
+//        NonterminalLevels result = TopologicalSort.sort(gr);
+//        result.print();
+//        
+//        gr.printRelationTable();
+//        
+//        boolean b = gr.regularizeAndLog("Logfile.txt");
+//        if (b) {
+//            gr.printSortedRules();
+//        }
         
-        boolean b = gr.regularizeAndLog("Logfile.txt");
-        if (b) {
-            gr.printSortedRules();
-        }
-        */
-        CFGrammar gr = (CFGrammar) GrammarCoding.Coding("TestGrammar2.txt");
-        gr.initFirstTable(1);
+        CFGrammar gr = (CFGrammar) GrammarCoding.CodingFromFile("TestGrammar2.txt");
+        gr.initFirstTable(4);
         SymbolicTable st = gr.getpSymTable();
-        int code = st.getSymbolCode("E0");
-        FirstSet fs = gr.getFirst(code);
-        int[] form = new int[2];
-        form[0] = st.getSymbolCode("T1");
-        form[1] = st.getSymbolCode("'+'");
-        String[] input = {"T1","'+'"};
-        fs = gr.getFirst(st.getFormCode(input));
+//        int code = st.getSymbolCode("T1");
+//        FirstSet fs = gr.getFirst(code);
+//        int[] form = new int[2];
+//        form[0] = st.getSymbolCode("T1");
+//        form[1] = st.getSymbolCode("'+'");
+        String[] input = {"'('","'+'","'('"};
+        FirstSet fs = gr.getFirst(st.getFormCode(input));
         System.out.println(gr.getFirstAsString(fs));
-        fs = gr.getFollow("T1", 1);
-        System.out.println(gr.getFirstAsString(fs));
+//        FirstSet fs = gr.getFollow("T0", 4);
+//        System.out.println(gr.getFirstAsString(fs));
     }
 }

@@ -1,6 +1,5 @@
 package formallanguages.src;
 
-import formallanguages.exceptions.IncorrectSymbolCodeException;
 import formallanguages.exceptions.TooLongRuleException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -15,6 +14,13 @@ public class CFRGrammar extends Grammar{
     
     public CFRGrammar(SymbolicTable pSymTable, RulesTable pRulesTable) {
         super(pSymTable, pRulesTable);
+    }
+
+    @Override
+    public StringBuilder printGrammar(StringBuilder sb) {
+        sb.append(Grammar.CFRG).append(eol);
+        sb = super.printGrammar(sb);
+        return sb;
     }
     
     public boolean regularize() throws TooLongRuleException {
@@ -58,8 +64,8 @@ public class CFRGrammar extends Grammar{
     }
     
     public boolean regularizeAndLog(String filename) 
-            throws TooLongRuleException, IOException, IncorrectSymbolCodeException {
-        BufferedWriter br = new BufferedWriter(new FileWriter(filename));
+            throws TooLongRuleException, IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
         if (pNlvls == null) {
             TopologicalSort.sort(this);
         }
@@ -79,9 +85,9 @@ public class CFRGrammar extends Grammar{
             for (int code : liter.next()) {
                 position = 0;
                 rule = pRulesTable.getRule(code);
-                br.write("Next Nonterminal processing\n");
-                br.write(pSymTable.getNonTerm(code) + ": ");
-                br.write(getRuleAsString(code) + "\n");
+                bw.write("Next Nonterminal processing\n");
+                bw.write(pSymTable.getNonTermByRuleCode(code) + ": ");
+                bw.write(getRuleAsString(code) + "\n");
                 System.arraycopy(rule, 0, buf, 0, rule.length);
                 i = 0;
                 if (buf[1] == SymbolicTable.DOT) 
@@ -93,7 +99,7 @@ public class CFRGrammar extends Grammar{
                         sb.append("Nonterminal for expanding: ");
                         sb.append(pSymTable.getSymbol(buf[i]));
                         sb.append('\n');
-                        sb.append(pSymTable.getNonTerm(code));
+                        sb.append(pSymTable.getNonTermByRuleCode(code));
                         sb.append(": ");
                         for (int j = 0; j < position; j++) {
                             sb.append(pSymTable.getSymbol(rule[j]));
@@ -106,19 +112,19 @@ public class CFRGrammar extends Grammar{
                             sb.append(pSymTable.getSymbol(buf[j]));
                         }
                         sb.append('\n');
-                        br.append(sb.toString());
+                        bw.append(sb.toString());
                         sb.delete(0, sb.length());
                     } else {
                         rule[position ++] = buf[i];
                     }
                     i ++;
                 }
-                br.append('\n');
+                bw.append('\n');
                 rule[position ++] = SymbolicTable.DOT;
             }
         }
-        br.newLine();
-        br.close();
+        bw.newLine();
+        bw.close();
         
         return true;
     }
